@@ -30,7 +30,6 @@ github:
     - hive
     - sql
     - kubernetes
-    - hacktoberfest
   enabled_merge_buttons:
     squash: true
     merge: false
