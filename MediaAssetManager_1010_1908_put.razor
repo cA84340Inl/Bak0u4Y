@@ -1,0 +1,98 @@
+// 代码生成时间: 2025-10-10 19:08:58
+using Microsoft.AspNetCore.Components;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
+
+namespace MediaAssetApp
+{
+    public partial class MediaAssetManager
+    {
+        // 媒体文件存储目录
+        private const string MediaDirectory = "./MediaAssets";
+
+        // 媒体文件列表
+        private List<string> mediaFiles = new List<string>();
+
+        // 构造函数
+        public MediaAssetManager()
+        {
+            if (!Directory.Exists(MediaDirectory))
+            {
+                Directory.CreateDirectory(MediaDirectory);
+            }
+
+            LoadMediaFiles();
+        }
+
+        // 加载媒体文件列表
+        private void LoadMediaFiles()
+        {
+            try
+            {
+                mediaFiles = Directory.GetFiles(MediaDirectory)
+                    .Select(Path.GetFileName)
+                    .ToList();
+            }
+            catch (Exception ex)
+            {
+                // 异常处理
+                Console.WriteLine($"Error loading media files: {ex.Message}");
+            }
+        }
+
+        // 添加媒体文件
+        public async Task AddMediaFile(string fileName)
+        {
+            try
+            {
+                string filePath = Path.Combine(MediaDirectory, fileName);
+                await File.WriteAllBytesAsync(filePath, new byte[0]); // 示例：创建空文件
+                mediaFiles.Add(fileName);
+                StateHasChanged();
+            }
+            catch (Exception ex)
+            {
+                // 异常处理
+                Console.WriteLine($"Error adding media file: {ex.Message}");
+            }
+        }
+
+        // 删除媒体文件
+        public async Task RemoveMediaFile(string fileName)
+        {
+            try
+            {
+                string filePath = Path.Combine(MediaDirectory, fileName);
+                if (File.Exists(filePath))
+                {
+                    await Task.Run(() => File.Delete(filePath));
+                    mediaFiles.Remove(fileName);
+                    StateHasChanged();
+                }
+                else
+                {
+                    Console.WriteLine("File not found.");
+                }
+            }
+            catch (Exception ex)
+            {
+                // 异常处理
+                Console.WriteLine($"Error removing media file: {ex.Message}");
+            }
+        }
+
+        // 渲染媒体文件列表
+        private RenderFragment MediaFilesList => builder =>
+        {
+            foreach (var file in mediaFiles)
+            {
+                builder.OpenElement(0, "li");
+                builder.AddContent(1, file);
+                builder.CloseElement();
+            }
+        };
+    }
+}
